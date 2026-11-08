@@ -75,11 +75,17 @@ npx expo start --lan
 ```
 
 - Escanea el código QR desde la app **Expo Go** en tu celular.
-- *Nota:* Si el computador tiene una IP específica en la red local (ej. `192.168.1.15`), puedes pasarla directamente:
+- *Nota:* Si el computador tiene una IP específica en la red local (ej. `192.168.20.27`), puedes pasarla directamente:
   ```bash
-  EXPO_PUBLIC_API_URL=http://192.168.1.15:8000 npx expo start --lan
+  EXPO_PUBLIC_API_URL=http://192.168.20.27:8000 npx expo start --lan
   ```
 - La app también cuenta con un botón en la pantalla de bienvenida para inspeccionar y ajustar la URL del backend en caliente.
+
+> **Optimizaciones añadidas para iOS / iPhone 16 en Expo Go:**
+> - **Input 2FA de 6 Celdas Visuales:** Cajas independientes de dígitos que eliminan fallos de fuentes monoespaciadas y espaciado de texto en iOS.
+> - **Enrolamiento MFA UniSabana:** Botón de 1 toque para enrolar la cuenta localmente sin requerir un segundo dispositivo, además de botón para abrir `/mfa/enroll` en Safari.
+> - **Bloqueo con Face ID / PIN:** Renderizado como Overlay Modal nativo en la raíz para evitar bucles de navegación; soporte para Face ID y longitudes de PIN de 4 a 6 dígitos con auto-limpieza.
+> - **Respaldos Cifrados (.totp):** Modales dedicados de exportación e importación con Scrypt + AES-256-GCM y `expo-file-system/legacy`, sin depender de `Alert.prompt`.
 
 ---
 
