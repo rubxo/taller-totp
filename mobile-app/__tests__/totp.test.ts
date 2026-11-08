@@ -1,0 +1,12 @@
+import {createHash} from 'node:crypto';
+import type {Digest} from '../src/lib/hmac';
+const digest:Digest=async(a,b)=>new Uint8Array(createHash(a.toLowerCase()).update(b).digest());
+import {generateTotp} from '../src/lib/totp';import type {Account} from '../src/types';
+const base={id:'x',issuer:'',label:'',secret:'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ',digits:8 as 8,period:30};
+test.each([[59,94287082],[1111111109,7081804],[1111111111,14050471],[1234567890,89005924],[2000000000,69279037]])('RFC SHA1 %s', async (t,e)=>expect((await generateTotp({...base,algorithm:'SHA1'},t*1000,digest)).code).toBe(String(e).padStart(8,'0')));
+test('RFC SHA256',async()=>expect((await generateTotp({...base,secret:'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZA',algorithm:'SHA256'},59*1000,digest)).code).toBe('46119246'));
+test('RFC SHA512',async()=>expect((await generateTotp({...base,secret:'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQGEZDGNA',algorithm:'SHA512'},59*1000,digest)).code).toBe('90693936'));
+import { decryptBackupPayload, encryptBackupPayload } from '../src/lib/backup';
+test('respaldo: ida y vuelta', async () => { const envelope = await encryptBackupPayload('["otpauth://totp/demo?secret=JBSWY3DPEHPK3PXP"]', 'contraseña-segura'); expect(await decryptBackupPayload(envelope, 'contraseña-segura')).toContain('JBSWY3DPEHPK3PXP'); });
+test('respaldo: contraseña incorrecta', async () => { const envelope = await encryptBackupPayload('secreto', 'contraseña-segura'); await expect(decryptBackupPayload(envelope, 'otra-contraseña')).rejects.toThrow('contraseña es incorrecta'); });
+test('respaldo: archivo manipulado', async () => { const envelope = await encryptBackupPayload('secreto', 'contraseña-segura'); envelope.ciphertext = `${envelope.ciphertext.slice(0, -1)}${envelope.ciphertext.endsWith('A') ? 'B' : 'A'}`; await expect(decryptBackupPayload(envelope, 'contraseña-segura')).rejects.toThrow('respaldo fue manipulado'); });

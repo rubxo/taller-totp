@@ -1,0 +1,1 @@
+import {useEffect,useState} from 'react';export function useTick(){const [now,setNow]=useState(Date.now());useEffect(()=>{const x=setInterval(()=>setNow(Date.now()),250);return()=>clearInterval(x);},[]);return now;}

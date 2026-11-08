@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "TOTP Authenticator",
+    "slug": "totp-authenticator",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "unisabana-auth",
+    "userInterfaceStyle": "automatic",
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Permite usar la c\u00e1mara para escanear c\u00f3digos QR."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Permite usar Face ID para proteger tus códigos de autenticación TOTP."
+        }
+      ],
+      "expo-font",
+      "expo-secure-store",
+      "expo-sharing",
+      "expo-status-bar",
+      "expo-web-browser"
+    ],
+    "android": {
+      "package": "com.rubxo.totp"
+    },
+    "ios": {
+      "bundleIdentifier": "com.rubxo.totp",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Permite usar Face ID para proteger tus códigos de autenticación TOTP."
+      }
+    }
+  }
+}

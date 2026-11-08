@@ -1,0 +1,4 @@
+import * as SecureStore from 'expo-secure-store';import type {Account} from '../types';
+const INDEX='accounts.index';export async function listAccounts(){const ids=JSON.parse(await SecureStore.getItemAsync(INDEX)||'[]') as string[];return (await Promise.all(ids.map(async id=>{const x=await SecureStore.getItemAsync(`account.${id}`);return x?JSON.parse(x) as Account:null;}))).filter(Boolean) as Account[];}
+export async function saveAccount(a:Account){const ids=JSON.parse(await SecureStore.getItemAsync(INDEX)||'[]') as string[];if(!ids.includes(a.id))ids.push(a.id);await SecureStore.setItemAsync(`account.${a.id}`,JSON.stringify(a));await SecureStore.setItemAsync(INDEX,JSON.stringify(ids));}
+export async function removeAccount(id:string){const ids=(JSON.parse(await SecureStore.getItemAsync(INDEX)||'[]') as string[]).filter(x=>x!==id);await SecureStore.deleteItemAsync(`account.${id}`);await SecureStore.setItemAsync(INDEX,JSON.stringify(ids));}
