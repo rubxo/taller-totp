@@ -4,6 +4,8 @@
 **Institución:** Universidad de La Sabana — Facultad de Ingeniería  
 **Sesión:** Sesión 14 (Autenticación Móvil, Tokens y Seguridad de Recursos)
 
+**Material de entrega:** [Guion del video de 2:30 y versión de 90 segundos](GUION_VIDEO.md) · [Enunciado del taller](docs/ENUNCIADO.md)
+
 ---
 
 ## 1. Resumen de Arquitectura y Cumplimiento
