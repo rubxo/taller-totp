@@ -44,9 +44,29 @@ Este proyecto implementa una arquitectura de seguridad móvil completa para clie
 
 ### Requisitos Previos
 - Node.js (v18+)
-- Python 3.12+ con entorno virtual en `backend-auth/.venv`
+- Python 3.12+ con soporte para crear entornos virtuales
 - Dispositivo móvil con **Expo Go** (SDK 58) o Emulador Android / Simulador iOS
 - Teléfono y computador conectados a la misma red Wi-Fi (para pruebas en dispositivo físico)
+
+---
+
+### Instalación desde cero
+
+```bash
+git clone https://github.com/rubxo/taller-totp.git
+cd taller-totp
+
+python3 -m venv backend-auth/.venv
+backend-auth/.venv/bin/python -m pip install -r backend-auth/requirements.txt
+
+cd mobile-app
+npm ci
+cp .env.example .env
+```
+
+Edita `mobile-app/.env` y reemplaza `<IP-de-tu-PC>` por la IP local del computador que ejecutará el backend. El puerto del ejemplo es `8010`; los comandos siguientes utilizan ese mismo puerto. En el teléfono, `localhost` apunta al propio teléfono.
+
+Las credenciales y la semilla incluidas son de demostración para el laboratorio. Los archivos `.env`, entornos virtuales y dependencias locales quedan fuera del repositorio.
 
 ---
 
@@ -54,7 +74,7 @@ Este proyecto implementa una arquitectura de seguridad móvil completa para clie
 
 ```bash
 cd backend-auth
-ACCESS_TTL_SECONDS=15 .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+ACCESS_TTL_SECONDS=15 .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8010
 ```
 
 > **Credenciales de demostración:**
@@ -62,8 +82,8 @@ ACCESS_TTL_SECONDS=15 .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
 > - Contraseña: `sabana2026`
 > - Semilla TOTP Demo: `JBSWY3DPEHPK3PXP`
 
-- Portal de inicio de sesión: `http://localhost:8000/oauth/authorize`
-- Pantalla de enrolamiento QR: `http://localhost:8000/mfa/enroll`
+- Portal de inicio de sesión: `http://localhost:8010/oauth/authorize`
+- Pantalla de enrolamiento QR: `http://localhost:8010/mfa/enroll`
 
 ---
 
@@ -77,7 +97,7 @@ npx expo start --lan
 - Escanea el código QR desde la app **Expo Go** en tu celular.
 - *Nota:* Si el computador tiene una IP específica en la red local (ej. `192.168.20.27`), puedes pasarla directamente:
   ```bash
-  EXPO_PUBLIC_API_URL=http://192.168.20.27:8000 npx expo start --lan
+  EXPO_PUBLIC_API_URL=http://192.168.20.27:8010 npx expo start --lan
   ```
 - La app también cuenta con un botón en la pantalla de bienvenida para inspeccionar y ajustar la URL del backend en caliente.
 
@@ -94,7 +114,7 @@ npx expo start --lan
 | # | Prueba de Aceptación | Procedimiento en la App | Resultado Esperado |
 | :- | :--- | :--- | :--- |
 | **1** | **Flujo OAuth + PKCE con Navegador del Sistema** | En la pantalla de bienvenida, presionar **«Iniciar Sesión Institucional»**. El sistema abre el navegador nativo (no WebView). Presionar *«Rellenar credenciales demo»* y enviar. | El navegador redirige mediante deep link a la app móvil, se valida el parámetro `state` anti-CSRF, se intercambia el código por tokens y el `refresh_token` queda guardado en `SecureStore`. |
-| **2** | **Paridad Estándar TOTP** | Abrir `http://<IP>:8000/mfa/enroll` en el computador. Escanear el QR con **Google Authenticator** oficial y en la app con **«Escanear QR»** (o usar la opción *«Cargar Cuenta UniSabana Demo»*). | Ambas aplicaciones muestran exactamente los mismos 6 dígitos al mismo tiempo. |
+| **2** | **Paridad Estándar TOTP** | Abrir `http://<IP>:8010/mfa/enroll` en el computador. Escanear el QR con **Google Authenticator** oficial y en la app con **«Escanear QR»** (o usar la opción *«Cargar Cuenta UniSabana Demo»*). | Ambas aplicaciones muestran exactamente los mismos 6 dígitos al mismo tiempo. |
 | **3** | **Cálculo Offline en Modo Avión** | Activar el **Modo Avión** del teléfono. Ir al módulo *«Autenticador TOTP»*, esperar a que el contador de 30s llegue a 0 y observar la actualización. | El código se actualiza matemáticamente en tiempo real sin conexión a internet y sin peticiones de red. |
 | **4** | **Step-Up Authentication & Bóveda** | Entrar a *«Bóveda Crítica»*. La app captura el `403 Forbidden` (`mfa_required`) y abre el modal 2FA. Presionar *«Autocompletar desde mi autenticador UniSabana»* y confirmar. | El servidor verifica el TOTP y devuelve un `elevated_token` con `mfa_verified: true`, desbloqueando el expediente confidencial. |
 | **5** | **Ataque de Repetición (Anti-Replay)** | Inmediatamente tras desbloquear la bóveda, presionar **«Ejecutar Prueba de Ataque de Repetición»** para reenviar el mismo código. | El backend rechaza la solicitud con **`409 Conflict: Replay Attack Detected`**, impidiendo el reuso del código en la misma ventana de tiempo. |
